@@ -37,21 +37,23 @@ namespace AAAA {
 			KillAllThreads();
 		}
 
+		void OnDestroy() {
+			KillAllThreads();
+		}
+
 
 		void KillAllThreads() {
 			killAllThreads = true;
 			int i = 0;
 			foreach (var th in threads) {
 				if (th.IsAlive) {
-					th.Abort();
+					th.Interrupt();
+					th.Join(100);
 					i++;
 				}
 			}
 			if (i > 0) {
 				Debug.Log("[THREADING] Aborting " + i + " threads.\n");
-			}
-			if (threads.Any(th => th.IsAlive)) {
-				Debug.Log("[THREADING] Some threads are unresponsive and cannot be killed. Use the killAll variable in your loops.\n");
 			}
 		}
 
