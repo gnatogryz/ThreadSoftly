@@ -20,13 +20,12 @@ namespace AAAA {
 			DontDestroyOnLoad(instance.gameObject);
 		}
 
-		void Update() {
+		void FixedUpdate() {
 			if (dispatch.Count > 0) {
 				lock (dispatch) {
 					while (dispatch.Count > 0) {
 						dispatch.Dequeue()();
 					}
-					System.Threading.Monitor.PulseAll(dispatch);
 				}
 			}
 
