@@ -20,9 +20,14 @@ namespace AAAA {
 			DontDestroyOnLoad(instance.gameObject);
 		}
 
-		void Update() {			
-			while (dispatch.Count > 0) {
-				dispatch.Dequeue()();
+		void Update() {
+			if (dispatch.Count > 0) {
+				lock (dispatch) {
+					while (dispatch.Count > 0) {
+						dispatch.Dequeue()();
+					}
+					System.Threading.Monitor.PulseAll(dispatch);
+				}
 			}
 
 			threads.RemoveAll(th => th.IsAlive == false);
@@ -60,7 +65,9 @@ namespace AAAA {
 
 
 		public static void Dispatch(System.Action what) {
-			instance.dispatch.Enqueue(what);
+			lock (instance.dispatch) {
+				instance.dispatch.Enqueue(what);
+			}
 		}
 	}
 }
