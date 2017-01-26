@@ -51,15 +51,11 @@ namespace AAAA {
 		}
 
 
-		
-
-
-		public static void Run(System.Action what) {
-			var th = new System.Threading.Thread(() => {
-				what();
-			});
+		public static System.Threading.Thread Run(System.Threading.ThreadStart what) {
+			var th = new System.Threading.Thread(what);
 			instance.threads.Add(th);
 			th.Start();
+			return th;
 		}
 
 
