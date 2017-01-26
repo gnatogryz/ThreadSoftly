@@ -24,6 +24,8 @@ namespace AAAA {
 			while (dispatch.Count > 0) {
 				dispatch.Dequeue()();
 			}
+
+			threads.RemoveAll(th => th.IsAlive == false);
 		}
 
 		void OnDisable() {
@@ -59,6 +61,7 @@ namespace AAAA {
 			instance.threads.Add(th);
 			th.Start();
 		}
+
 
 		public static void Dispatch(System.Action what) {
 			instance.dispatch.Enqueue(what);

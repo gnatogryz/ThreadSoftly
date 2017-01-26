@@ -8,30 +8,51 @@ public class Tester : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Thread.Run(() => {
-			Debug.Log("KURWA 1");
-			float i = -555;
-			while (i < 555 && !Thread.killAll) {
-				i += 0.00006f;
+			Debug.Log("Starting 1");
+			float i = -55;
+			while (i < 55 && !Thread.killAll) {
+				i += 0.006f;
 			}
 			Thread.Dispatch(() => {
-				Debug.Log("MAĆ 1");
+				Debug.Log("Finished 1");
 			});
 		});
 
 		Thread.Run(() => {
-			Debug.Log("KURWA 2");
+			Debug.Log("Starting 2");
+			float i = -555;
+			while (i < 556 && !Thread.killAll) {
+				i += 0.0006f;
+			}
+			Thread.Dispatch(() => {
+				Debug.Log("Finished 2");
+			});
+		});
+
+		Thread.Run(() => {
+			Debug.Log("Starting 3");
+			float i = -555;
+			while (i < 556 && !Thread.killAll) {
+				i += 0.0006f;
+			}
+			Thread.Dispatch(() => {
+				Debug.Log("Finished 3");
+			});
+		});
+
+		Thread.Run(() => {
+			Debug.Log("Starting 4");
 			float i = -555;
 			while (i < 556 && !Thread.killAll) {
 				i += 0.00006f;
 			}
 			Thread.Dispatch(() => {
-				Debug.Log("MAĆ 2");
+				Debug.Log("Finished 4");
 			});
 		});
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
 	}
 }
