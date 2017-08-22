@@ -5,25 +5,21 @@ using AAAA;
 
 public class Tester : MonoBehaviour {
 
-	Worker worker;
 	int finishedThreads = 0;
 	public int busyThreads;
 
 	// Use this for initialization
-	void Start () {
+	void Start() {
 
-
-	worker = new Worker(8);
-
-	worker.Run(() => {
-		Debug.Log("Kurwa");
-		worker.Dispatch(() => Debug.Log("Mać"));
-	});
+		Threader.Run(() => {
+			Debug.Log("Kurwa");
+			Threader.Dispatch(() => Debug.Log("Mać"));
+		});
 
 		int i = -1;
 		while (++i < 500) {
 			int idx = i;
-			worker.Run(() => {
+			Threader.Run(() => {
 				int ź = -10;
 				while (++ź < 20) {
 					var a = Mathf.Sqrt(Mathf.Sin(1119) % 4 % 3.5f) % 9;
@@ -31,14 +27,14 @@ public class Tester : MonoBehaviour {
 					Debug.LogWarning(b);
 				}
 
-				//Debug.Log("Started " + idx);
+				Debug.Log("Started " + idx);
 
-				if (i==100) {
+				if (i == 100) {
 					Debug.Log(GetComponent<Rigidbody>().freezeRotation);
 				}
 
-				worker.Dispatch(() => {
-					//Debug.Log("Finished " + idx);
+				Threader.Dispatch(() => {
+					Debug.Log("Finished " + idx);
 					finishedThreads++;
 				});
 			});
@@ -47,6 +43,6 @@ public class Tester : MonoBehaviour {
 
 
 	void Update() {
-		busyThreads = worker.busyThreadCount;
+		//busyThreads = worker.busyThreadCount;
 	}
 }

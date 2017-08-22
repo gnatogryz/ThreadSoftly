@@ -5,12 +5,22 @@ using System.Linq;
 namespace AAAA {
 
 	public static class Threader {
-		public static System.Threading.Thread Run(System.Threading.ThreadStart job) {
-			return Internal.Dispatcher.Run(job);
+		public static void Run(System.Action job) {
+			Internal.Dispatcher.Run(job);
 		}
 
 		public static void Dispatch(System.Action job) {
 			Internal.Dispatcher.Dispatch(job);
+		}
+
+		public static void Sleep(int milliseconds) {
+			System.Threading.Thread.Sleep(milliseconds);
+		}
+
+		public static bool alive {
+			get {
+				return !Internal.Dispatcher.killAll;
+			}
 		}
 	}
 
@@ -42,15 +52,22 @@ namespace AAAA {
 
 			for (int i = 0; i < threadCount; i++) {
 				int idx = i;
-				busy[i] = false;
-				loopThreads[i] = new System.Threading.Thread(() => InternalLoop(idx));
-				loopThreads[i].Start();
+				busy[idx] = false;
+				loopThreads[idx] = new System.Threading.Thread(() => InternalLoop(idx));
+				loopThreads[idx].Start();
 			}
 		}
 
 		public void Kill() {
 			Internal.Dispatcher.onKillThreads -= Kill;
-			killed = true;		
+			killed = true;
+			for (int i = 0; i < loopThreads.Length; i++) {
+				if (loopThreads[i].IsAlive) {
+					loopThreads[i].Interrupt();
+					loopThreads[i].Join(100);
+				}
+			}
+			System.Threading.Thread.Sleep(100);
 		}
 
 		public void Run(System.Action job) {
@@ -92,6 +109,7 @@ namespace AAAA {
 
 				System.Threading.Thread.Sleep(0);
 			}
+
 			Debug.Log("[THREADING] Stopping worker thread " + (i + 1));
 		}
 	}
@@ -102,7 +120,8 @@ namespace AAAA {
 
 			static Dispatcher instance;
 
-			bool killAllThreads = false;
+			bool killAllThreads = true;
+
 			public static bool killAll { get { return instance.killAllThreads; } }
 
 			volatile List<System.Threading.Thread> threads = new List<System.Threading.Thread>();
@@ -110,12 +129,17 @@ namespace AAAA {
 
 			static object mutex;
 
+			static Worker worker;
+
 			[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 			static void Initialize() {
-				mutex = new object();
 				instance = new GameObject("Threading").AddComponent<Dispatcher>();
 				instance.gameObject.hideFlags = HideFlags.HideInHierarchy;
+				instance.killAllThreads = false;
 				DontDestroyOnLoad(instance.gameObject);
+				
+				worker = new Worker(8);
+				mutex = new object();
 			}
 
 			public static event System.Action onKillThreads;
@@ -133,10 +157,18 @@ namespace AAAA {
 			}
 
 			void OnDisable() {
-				KillAllThreads();
+				//worker.Kill();
+				//KillAllThreads();
 			}
 
 			void OnDestroy() {
+				//worker.Kill();
+				//KillAllThreads();
+			}
+
+
+			void OnApplicationQuit() {
+				worker.Kill();
 				KillAllThreads();
 			}
 
@@ -159,11 +191,12 @@ namespace AAAA {
 			}
 
 
-			public static System.Threading.Thread Run(System.Threading.ThreadStart what) {
-				var th = new System.Threading.Thread(what);
+			public static void Run(System.Action what) {
+				/*var th = new System.Threading.Thread(what);
 				instance.threads.Add(th);
-				th.Start();
-				return th;
+				th.Start();*/
+				worker.Run(what);
+				//return th;
 			}
 
 
