@@ -6,7 +6,6 @@ using AAAA;
 public class Tester : MonoBehaviour {
 
 	int finishedThreads = 0;
-	public int busyThreads;
 
 	// Use this for initialization
 	void Start() {
