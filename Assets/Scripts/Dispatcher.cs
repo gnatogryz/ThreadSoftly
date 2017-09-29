@@ -7,7 +7,13 @@ namespace AAAA {
 
 	public static class Threader {
 		public static void Run(System.Action job) {
-			ThreadPool.QueueUserWorkItem(o => job());
+			ThreadPool.QueueUserWorkItem(o => {
+				try {
+					job();
+				} catch (System.Exception e) {
+					Debug.LogError(e.Message + "\n" + e.StackTrace);
+				}
+			});
 		}
 
 		public static void Dispatch(System.Action job) {
@@ -38,8 +44,8 @@ namespace AAAA {
 			}
 
 			void FixedUpdate() {
-				if (dispatch.Count > 0) {
-					lock (mutex) {
+				lock (mutex) {
+					if (dispatch.Count > 0) {
 						while (dispatch.Count > 0) {
 							dispatch.Dequeue()();
 						}
