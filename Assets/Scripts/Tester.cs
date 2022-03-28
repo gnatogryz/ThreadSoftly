@@ -11,8 +11,8 @@ public class Tester : MonoBehaviour {
 	void Start() {
 
 		Threader.Run(() => {
-			Debug.Log("Kurwa");
-			Threader.Dispatch(() => Debug.Log("Mać"));
+			Debug.Log("a");
+			Threader.Dispatch(() => Debug.Log("b"));
 		});
 
 		int i = -1;
